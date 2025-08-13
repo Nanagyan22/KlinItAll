@@ -28,3 +28,5 @@ streamlit>=1.48.0
 textblob>=0.19.0
 xlrd>=2.0.2
 xmltodict>=0.14.2
+sqlalchemy>=2.0.43
+
