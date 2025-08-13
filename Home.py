@@ -102,7 +102,7 @@ def main():
         st.markdown("""
             **KlinItAll** is an intelligent, fully automated data preprocessing system designed to streamline 
             and simplify the cleaning, profiling, and transformation of structured datasets.
-            It automates the tedious data preprocessing tasks that typically consume 50%-80% of a data analyst/scientist's time. 
+            It automates the tedious data preprocessing tasks that typically consume 50-80% of a data analyst's or scientist's time. 
             This intelligent system guides you through a comprehensive cleaning workflow with smart recommendations 
             and one-click solutions. With full automation,you can focus on insights, modeling, and impactful analysis, 
             while KlinItAll handles the repetitive tasks of data cleaning.
