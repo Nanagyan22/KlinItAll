@@ -7,13 +7,14 @@ import streamlit as st
 import json
 from datetime import datetime
 
+
 class GuidedTour:
     """Manages the interactive guided tour system with cute character hints"""
-    
+
     def __init__(self):
         self.character_name = "Klini"
         self.character_emoji = "🤖"
-        
+
         # Initialize tour state
         if 'tour_active' not in st.session_state:
             st.session_state.tour_active = False
@@ -23,7 +24,7 @@ class GuidedTour:
             st.session_state.tour_completed_steps = set()
         if 'show_hints' not in st.session_state:
             st.session_state.show_hints = True
-        
+
         # Define tour steps for each page
         self.tour_steps = {
             "upload": [
@@ -95,7 +96,7 @@ class GuidedTour:
                 }
             ]
         }
-        
+
         # Character responses for different situations
         self.character_responses = {
             "encouragement": [
@@ -129,7 +130,10 @@ class GuidedTour:
         """Display character hint with cute styling"""
         if not st.session_state.show_hints:
             return
-            
+
+        # Initialize hint variable first
+        hint = ""
+
         # Get appropriate message
         if custom_message:
             message = custom_message
@@ -139,8 +143,7 @@ class GuidedTour:
             hint = step.get("hint", "")
         else:
             message = "I'm here to help if you need guidance! 😊"
-            hint = ""
-        
+
         # Style based on hint type
         if hint_type == "success":
             bg_color = "#d4edda"
@@ -158,7 +161,7 @@ class GuidedTour:
             bg_color = "#f8f9fa"
             border_color = "#6c757d"
             icon = self.character_emoji
-        
+
         # Create character hint box
         st.markdown(f"""
         <div style="
@@ -187,65 +190,67 @@ class GuidedTour:
         st.session_state.tour_active = True
         st.session_state.tour_step = 0
         st.session_state.tour_completed_steps = set()
-        
+
     def end_tour(self):
         """End the guided tour"""
         st.session_state.tour_active = False
-        self.show_character_hint("", custom_message="Thanks for taking the tour! I'll still be here with hints if you need help. You can restart the tour anytime from the sidebar! 👋", hint_type="success")
-        
+        self.show_character_hint("",
+                                 custom_message="Thanks for taking the tour! I'll still be here with hints if you need help. You can restart the tour anytime from the sidebar! 👋",
+                                 hint_type="success")
+
     def next_step(self):
         """Move to next tour step"""
         if st.session_state.tour_active:
             st.session_state.tour_step += 1
-            
+
     def complete_step(self, step_id):
         """Mark a step as completed"""
         st.session_state.tour_completed_steps.add(step_id)
-        
+
     def show_tour_controls(self):
         """Show tour control buttons in sidebar"""
         with st.sidebar:
             st.markdown("---")
             st.markdown(f"### {self.character_emoji} Tour Guide")
-            
+
             if st.session_state.tour_active:
                 st.success("🎯 Tour Active")
-                
+
                 col1, col2 = st.columns(2)
                 with col1:
                     if st.button("⏸️ Pause Tour", use_container_width=True):
                         st.session_state.tour_active = False
                         st.rerun()
-                        
+
                 with col2:
                     if st.button("🛑 End Tour", use_container_width=True):
                         self.end_tour()
                         st.rerun()
-                        
+
                 # Show progress
                 total_steps = sum(len(steps) for steps in self.tour_steps.values())
                 completed = len(st.session_state.tour_completed_steps)
                 progress = min(completed / max(total_steps, 1), 1.0)
-                
+
                 st.progress(progress)
                 st.caption(f"Progress: {completed}/{total_steps} steps completed")
-                
+
             else:
                 if st.button("🚀 Start Guided Tour", use_container_width=True):
                     self.start_tour()
                     st.rerun()
-                    
+
                 if st.button("💡 Restart Tour", use_container_width=True):
                     self.start_tour()
                     st.rerun()
-            
+
             # Hint settings
             st.markdown("#### Settings")
             new_hints = st.checkbox("Show Character Hints", value=st.session_state.show_hints)
             if new_hints != st.session_state.show_hints:
                 st.session_state.show_hints = new_hints
                 st.rerun()
-                
+
             # Quick tips
             if st.session_state.show_hints:
                 st.markdown("#### 💡 Quick Tips")
@@ -257,7 +262,7 @@ class GuidedTour:
         """Show contextual help based on current page and context"""
         if not st.session_state.show_hints:
             return
-            
+
         help_messages = {
             "upload": {
                 "general": "Upload your dataset to get started! I support CSV, Excel, and JSON files up to 200MB.",
@@ -275,15 +280,16 @@ class GuidedTour:
                 "manual_mode": "Manual mode gives you full control over every cleaning decision."
             }
         }
-        
-        message = help_messages.get(page_name, {}).get(context, "I'm here to help! Feel free to explore and don't hesitate to try things out!")
+
+        message = help_messages.get(page_name, {}).get(context,
+                                                       "I'm here to help! Feel free to explore and don't hesitate to try things out!")
         self.show_character_hint(page_name, custom_message=message, hint_type="tip")
 
     def check_trigger_conditions(self, page_name, trigger_data=None):
         """Check if tour steps should be triggered based on user actions"""
         if not st.session_state.tour_active:
             return
-            
+
         # Define trigger conditions for automatic step progression
         triggers = {
             "upload": {
@@ -300,7 +306,7 @@ class GuidedTour:
                 "step_completed": lambda: trigger_data and trigger_data.get("steps_completed", 0) > 0
             }
         }
-        
+
         # Check triggers and advance tour if conditions are met
         page_triggers = triggers.get(page_name, {})
         for trigger_name, condition in page_triggers.items():
@@ -317,9 +323,10 @@ class GuidedTour:
             "pipeline_complete": "🏆 Amazing! You've completed the cleaning pipeline!",
             "data_downloaded": "📥 Perfect! Your clean data is ready to use!"
         }
-        
+
         message = celebrations.get(achievement, "🎉 Great work!")
         self.show_character_hint("", custom_message=message, hint_type="success")
+
 
 # Global tour instance
 guided_tour = GuidedTour()
