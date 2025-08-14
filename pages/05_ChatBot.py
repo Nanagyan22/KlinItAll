@@ -6,6 +6,20 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import matplotlib.pyplot as plt
 import seaborn as sns
 import re  # For more robust text cleaning
+import nltk  # For NLP tasks
+from nltk.sentiment.vader import SentimentIntensityAnalyzer  # For sentiment analysis
+from nltk.corpus import stopwords  # For stopword removal
+from nltk.tokenize import word_tokenize  # For tokenization
+
+# Download necessary NLTK data (only needs to be done once)
+try:
+    nltk.data.find('corpora/stopwords')
+    nltk.data.find('tokenizers/punkt')
+    nltk.data.find('sentiment/vader_lexicon')
+except LookupError:
+    nltk.download('stopwords')
+    nltk.download('punkt')
+    nltk.download('vader_lexicon')
 
 # -----------------------------
 # System Knowledge Database (Data Science Topics)
@@ -13,64 +27,81 @@ import re  # For more robust text cleaning
 
 system_knowledge = {
     "general": {
-        "about_system": "KlinItAll is an advanced data preprocessing and analysis system. It automates tasks like missing value imputation, outlier detection, feature scaling, categorical encoding, and advanced data transformations to prepare data for analysis and modeling.",
-        "how_it_works": "KlinItAll automatically detects data issues such as missing values, outliers, skewed distributions, and inappropriate data types. The system then applies the best preprocessing techniques like imputation, scaling, and encoding, with full automation.",
+        "about_system": "KlinItAll is an advanced AI-powered data assistant designed to help you with all aspects of data science, from understanding basic concepts to performing complex data preprocessing and analysis tasks. I can answer questions, provide explanations, generate visualizations, and even suggest code snippets to help you work with your data more effectively.",
+        "how_it_works": "I use a combination of natural language processing (NLP) and a comprehensive knowledge base to understand your questions and provide relevant answers. If you upload a dataset, I can also analyze it and provide insights specific to your data.",
         "core_features": [
-            "Handling missing values",
-            "Outlier detection and treatment",
-            "Feature scaling and normalization",
-            "Categorical encoding (one-hot, label, etc.)",
-            "Feature engineering (binning, interaction features)",
-            "Advanced batch processing and scheduling",
-            "Data visualization and profiling",
-            "Fuzzy matching and duplicate detection"
+            "Answering questions about data science, machine learning, and AI",
+            "Providing explanations of data preprocessing techniques",
+            "Generating visualizations of data",
+            "Suggesting code snippets for data manipulation",
+            "Analyzing uploaded datasets and providing insights",
+            "Performing sentiment analysis on text data",
+            "Identifying and suggesting ways to handle missing values and outliers",
+            "Recommending appropriate feature scaling and encoding methods",
+            "Suggesting feature engineering opportunities"
+        ],
+        "suggested_questions": [
+            "What is data science?",
+            "How do I handle missing values in my data?",
+            "What are some common data preprocessing techniques?",
+            "Can you give me a summary of my dataset?",
+            "What are some good feature engineering ideas?",
+            "How does reinforcement learning work?",
+            "What are generative models used for?",
+            "Explain the concept of transfer learning.",
+            "What is the difference between CNNs and RNNs?",
+            "How do transformers work in NLP?"
         ]
     },
     "data_preprocessing": {
         "missing_values": {
-            "description": "Missing values occur when some data points are not available or recorded. The system detects columns with missing values and suggests imputation strategies.",
+            "description": "Missing values occur when some data points are not available or recorded. I can help you identify columns with missing values and suggest appropriate imputation strategies.",
             "methods": [
-                "Drop rows/columns with excessive missing values.",
-                "Impute with mean, median, or mode for small percentages of missing data.",
-                "Use KNN imputation or model-based imputation for larger missing values."
+                "Dropping rows/columns with excessive missing values (use with caution!).",
+                "Imputing with the mean, median, or mode (simple but can introduce bias).",
+                "Using KNN imputation (more sophisticated, considers relationships between features).",
+                "Employing model-based imputation (e.g., using a regression model to predict missing values)."
             ]
         },
         "outliers": {
-            "description": "Outliers are extreme data points that deviate significantly from other observations in a dataset. The system uses methods like IQR, Z-score, or model-based techniques to detect and treat outliers.",
+            "description": "Outliers are extreme data points that deviate significantly from other observations. I can help you detect and handle outliers using various methods.",
             "methods": [
-                "Trim outliers (remove rows with extreme values).",
-                "Winsorize (capping the extreme values to a fixed range).",
-                "Replace outliers with the median or mean value."
+                "Trimming outliers (removing rows with extreme values).",
+                "Winsorizing (capping extreme values to a specified percentile).",
+                "Transforming the data (e.g., using a log transformation to reduce the impact of outliers).",
+                "Using robust statistical methods (less sensitive to outliers)."
             ]
         },
         "scaling": {
-            "description": "Scaling involves adjusting the feature values so they are on the same scale, often necessary for algorithms sensitive to feature magnitudes, such as gradient descent or distance-based models.",
+            "description": "Scaling involves adjusting feature values to a similar range. This is often necessary for algorithms sensitive to feature magnitudes.",
             "methods": [
-                "StandardScaler (z-score normalization).",
-                "MinMaxScaler (scales data to a specific range, e.g., [0,1]).",
-                "RobustScaler (scales data based on median and IQR).",
-                "PowerTransformer (Yeo-Johnson, Box-Cox) to handle skewed data."
+                "StandardScaler (z-score normalization): Centers the data around zero with unit variance.",
+                "MinMaxScaler: Scales data to a specific range (e.g., [0, 1]).",
+                "RobustScaler: Uses median and interquartile range, making it robust to outliers.",
+                "PowerTransformer (Yeo-Johnson, Box-Cox): Handles skewed data by applying a power transformation."
             ]
         },
         "encoding": {
-            "description": "Encoding transforms categorical variables into a numerical format. The system suggests methods based on the cardinality of the categories.",
+            "description": "Encoding transforms categorical variables into a numerical format suitable for machine learning models. I can suggest appropriate encoding methods based on the characteristics of your categorical features.",
             "methods": [
-                "One-hot encoding for columns with fewer than 15 unique categories.",
-                "Label encoding for ordinal categories.",
-                "Frequency encoding or target encoding for high cardinality categories."
+                "One-hot encoding: Creates binary columns for each category (suitable for low-cardinality features).",
+                "Label encoding: Assigns a unique integer to each category (suitable for ordinal features).",
+                "Frequency encoding: Replaces categories with their frequency in the dataset.",
+                "Target encoding: Replaces categories with the mean target value for that category (be careful of overfitting!)."
             ]
         },
         "feature_engineering": {
-            "description": "Feature engineering is the process of creating new features or transforming existing ones to improve the performance of machine learning models.",
+            "description": "Feature engineering is the art of creating new features or transforming existing ones to improve model performance. I can suggest various feature engineering techniques based on your data.",
             "methods": [
-                "Binning (equal-width or equal-frequency binning).",
-                "Interaction features (e.g., product, ratio, difference between columns).",
-                "Dimensionality reduction using PCA, t-SNE, or UMAP."
+                "Binning: Grouping continuous values into discrete bins.",
+                "Interaction features: Creating new features by combining existing ones (e.g., multiplication, division).",
+                "Polynomial features: Creating new features by raising existing ones to a power (e.g., squaring, cubing).",
+                "Date/time features: Extracting meaningful information from date/time columns (e.g., year, month, day of week)."
             ]
         }
     },
     "statistics": {
-        "description": "Statistics is a critical aspect of data science. It involves collecting, analyzing, interpreting, presenting, and organizing data.",
+        "description": "Statistics is the foundation of data science. I can help you understand key statistical concepts and apply them to your data.",
         "core_concepts": [
             "Mean, Median, Mode",
             "Variance, Standard Deviation",
@@ -79,11 +110,40 @@ system_knowledge = {
             "Hypothesis Testing"
         ],
         "common_questions": {
-            "mean": "The **mean** is the average of all values in a dataset.",
-            "variance": "The **variance** measures the spread of data points around the mean.",
-            "skewness": "Skewness measures the asymmetry of the distribution of data. Positive skewness means the right tail is longer, while negative skewness means the left tail is longer.",
-            "correlation": "Correlation is a measure of the relationship between two variables. Values range from -1 (perfect negative) to +1 (perfect positive).",
-            "regression": "Regression is used to model relationships between variables, typically for prediction."
+            "mean": "The **mean** is the average of all values in a dataset. It's sensitive to outliers.",
+            "variance": "The **variance** measures the spread of data points around the mean. A higher variance indicates greater variability.",
+            "skewness": "Skewness measures the asymmetry of the data distribution. Positive skewness indicates a longer tail on the right, while negative skewness indicates a longer tail on the left.",
+            "correlation": "Correlation measures the strength and direction of the linear relationship between two variables. Values range from -1 (perfect negative correlation) to +1 (perfect positive correlation).",
+            "regression": "Regression is used to model the relationship between a dependent variable and one or more independent variables. It's commonly used for prediction."
+        }
+    },
+    "advanced_ml_ai": {
+        "reinforcement_learning": {
+            "description": "Reinforcement Learning (RL) involves training agents to make decisions in an environment to maximize a reward. Techniques like Q-Learning and Deep Q Networks (DQN) are used."
+        },
+        "generative_models": {
+            "description": "Generative models, such as Generative Adversarial Networks (GANs) and Variational Autoencoders (VAEs), learn the underlying distribution of data and can generate new samples that resemble the original data."
+        },
+        "transfer_learning": {
+            "description": "Transfer learning leverages knowledge gained from solving one problem to solve a different but related problem. This can significantly reduce training time and improve performance, especially when data is limited."
+        },
+        "meta_learning": {
+            "description": "Meta-learning, or 'learning to learn,' focuses on developing algorithms that can quickly adapt to new tasks with limited data. It aims to improve the learning process itself."
+        },
+        "deep_learning": {
+            "description": "Deep learning uses neural networks with multiple layers to learn complex patterns from data. Common architectures include Convolutional Neural Networks (CNNs) for images and Recurrent Neural Networks (RNNs) for sequences."
+        },
+        "transformers": {
+            "description": "Transformers are a powerful type of neural network architecture that has revolutionized natural language processing (NLP). They use attention mechanisms to process sequential data and have achieved state-of-the-art results on various NLP tasks."
+        },
+        "cnn": {
+            "description": "Convolutional Neural Networks (CNNs) are particularly well-suited for image-related tasks. They use convolutional layers to automatically learn spatial hierarchies of features from images."
+        },
+        "gan": {
+            "description": "Generative Adversarial Networks (GANs) consist of two neural networks, a generator and a discriminator, that compete against each other. The generator tries to create realistic data, while the discriminator tries to distinguish between real and generated data."
+        },
+        "nlp": {
+            "description": "Natural Language Processing (NLP) is a field of AI that focuses on enabling computers to understand, interpret, and generate human language. Techniques like sentiment analysis, machine translation, and text summarization fall under NLP."
         }
     }
 }
@@ -150,103 +210,167 @@ def data_visualizations(df):
     else:
         st.write("There are no numeric columns available for visualization.")
 
+def perform_sentiment_analysis(text):
+    """Performs sentiment analysis on the given text using VADER."""
+    sid = SentimentIntensityAnalyzer()
+    scores = sid.polarity_scores(text)
+    return scores
+
+def remove_stopwords(text):
+    """Removes stopwords from the given text."""
+    stop_words = set(stopwords.words('english'))
+    word_tokens = word_tokenize(text)
+    filtered_sentence = [w for w in word_tokens if not w in stop_words]
+    return " ".join(filtered_sentence)
+
 # -----------------------------
-# Enhanced Answer Mapping with Clarification and Friendly Engagement
+# Enhanced Answer Mapping with NLP and Knowledge Access
 # -----------------------------
-
-def ask_for_clarity(question):
-    """Ask for clarification on the user's question."""
-    if "missing" in question or "outlier" in question or "scaling" in question:
-        return f"Did you mean to ask about **{', '.join([word for word in ['missing', 'outlier', 'scaling'] if word in question])}**? I can provide detailed information on this."
-
-    elif "data preprocessing" in question:
-        return "Are you referring to preprocessing steps like missing value handling, outlier detection, or scaling?"
-
-    return "I'm not sure I understand. Could you clarify your question? Are you asking about a specific aspect of the data or a method?"
 
 def answer_question(question, df=None):
     """Answers the question based on the provided DataFrame and system knowledge."""
-    q_lower = question.lower()
+    q_lower = question.lower().strip()
 
-    # Friendly Response for Greetings and Informal Queries
-    if "hello" in q_lower or "hi" in q_lower or "hey" in q_lower:
-        return "Hey there! 👋 How can I assist you with your data today?"
+    # --- Friendly Greetings and Introductions ---
+    if any(greet in q_lower for greet in ["hello", "hi", "hey", "you"]):
+        introduction = "Hey there! 👋 I'm KlinItAll, your AI-powered data assistant. I can help you with a wide range of data science tasks, including:\n\n"
+        introduction += "- Answering questions about data science, machine learning, and AI\n"
+        introduction += "- Providing explanations of data preprocessing techniques\n"
+        introduction += "- Generating visualizations of data (if you upload a dataset)\n"
+        introduction += "- Suggesting code snippets for data manipulation\n"
+        introduction += "- Analyzing uploaded datasets and providing insights\n"
+        introduction += "- Performing sentiment analysis on text data\n\n"
+        introduction += "To get started, try asking me a question or uploading a dataset. Here are some suggested questions:\n\n"
+        introduction += "\n".join([f"- {q}" for q in system_knowledge["general"]["suggested_questions"]])
+        return introduction
 
-    # Handle yes/no clarification
-    if "yes" in q_lower:
-        return "Great! Let me provide you with the relevant information."
+    # --- General system info ---
+    if "what is" in q_lower:
+        return "Ah, looks like you're asking for an explanation. Could you clarify which topic you're referring to? Data science, data preprocessing, or maybe something else?"
 
-    elif "no" in q_lower:
-        return "Okay, could you clarify what you're asking about? I'm here to help!"
-
-    # Clarifying vague questions
-    if any(keyword in q_lower for keyword in ['missing', 'outlier', 'scaling', 'data science', 'machine learning']):
-        return ask_for_clarity(question)
-
-    # Answering general Data Science questions (without needing data)
+    # --- Data Science / Machine Learning ---
     if "data science" in q_lower:
-        return "Data science involves extracting insights and knowledge from structured and unstructured data. It combines techniques from statistics, machine learning, and data mining to analyze and interpret complex data."
+        return system_knowledge["general"]["about_system"]
 
-    elif "machine learning" in q_lower:
-        return "Machine learning is a field of AI that focuses on building algorithms that allow computers to learn from data and make predictions or decisions based on that data."
+    if "machine learning" in q_lower:
+        return "Machine learning allows systems to learn from data and make predictions or decisions. It’s a core part of AI."
 
-    elif "statistics" in q_lower:
-        return "Statistics is the science of collecting, analyzing, and interpreting data. Key concepts include mean, median, variance, correlation, and hypothesis testing."
+    # --- Advanced AI & Machine Learning ---
+    if "reinforcement learning" in q_lower:
+        return system_knowledge["advanced_ml_ai"]["reinforcement_learning"]["description"]
 
-    elif "outliers" in q_lower:
-        return "Outliers are extreme values that differ significantly from other observations in a dataset. Would you like me to check for outliers in your dataset?"
+    if "generative models" in q_lower:
+        return system_knowledge["advanced_ml_ai"]["generative_models"]["description"]
 
-    elif "missing values" in q_lower:
-        return "Missing values occur when no data is recorded for a particular feature. Handling missing data can be done through methods like imputation (mean, median, mode) or deletion (drop rows/columns)."
+    if "transfer learning" in q_lower:
+        return system_knowledge["advanced_ml_ai"]["transfer_learning"]["description"]
 
-    elif "scaling" in q_lower:
-        return "Scaling refers to the process of adjusting feature values to a standard range, often necessary for algorithms that are sensitive to feature magnitudes, such as gradient descent or distance-based models."
+    if "meta learning" in q_lower:
+        return system_knowledge["advanced_ml_ai"]["meta_learning"]["description"]
 
-    elif "data preprocessing" in q_lower:
-        return "Data preprocessing involves cleaning and transforming raw data into a format suitable for analysis. Common steps include handling missing values, encoding categorical data, scaling features, and detecting outliers."
+    if "deep learning" in q_lower:
+        return system_knowledge["advanced_ml_ai"]["deep_learning"]["description"]
 
-    # Handle specific dataset questions (only if data is available)
-    if df is not None:
-        if "dataset summary" in q_lower:
+    if "transformers" in q_lower:
+        return system_knowledge["advanced_ml_ai"]["transformers"]["description"]
+
+    # --- Data Preprocessing ---
+    if "data preprocessing" in q_lower or "data cleaning" in q_lower:
+        return "Data preprocessing is about preparing raw data for analysis. It includes cleaning, transforming, handling missing values, and encoding."
+
+    if "missing values" in q_lower or "imputation" in q_lower:
+        return system_knowledge["data_preprocessing"]["missing_values"]["description"] + "\n\nHere are some common methods:\n" + "\n".join([f"- {m}" for m in system_knowledge["data_preprocessing"]["missing_values"]["methods"]])
+
+    if "outliers" in q_lower:
+        return system_knowledge["data_preprocessing"]["outliers"]["description"] + "\n\nHere are some common methods:\n" + "\n".join([f"- {m}" for m in system_knowledge["data_preprocessing"]["outliers"]["methods"]])
+
+    if "scaling" in q_lower:
+        return system_knowledge["data_preprocessing"]["scaling"]["description"] + "\n\nHere are some common methods:\n" + "\n".join([f"- {m}" for m in system_knowledge["data_preprocessing"]["scaling"]["methods"]])
+
+    # --- NLP Tasks ---
+    if "sentiment analysis" in q_lower:
+        if df is not None:
+            text_cols = df.select_dtypes(include='object').columns
+            if not text_cols.empty:
+                # Perform sentiment analysis on the first text column
+                first_text_col = text_cols[0]
+                sentiment_scores = df[first_text_col].astype(str).apply(perform_sentiment_analysis)
+                st.write(f"Sentiment analysis scores for the first text column ('{first_text_col}'):")
+                st.write(sentiment_scores)
+                return "I've performed sentiment analysis on the first text column of your dataset.  See the results above!"
+            else:
+                return "There are no text columns in your dataset to perform sentiment analysis on."
+        else:
+            return "Sentiment analysis is a technique used to determine the emotional tone of a piece of text.  Please upload a dataset with text columns to perform sentiment analysis."
+
+    if "remove stopwords" in q_lower:
+        if df is not None:
+            text_cols = df.select_dtypes(include='object').columns
+            if not text_cols.empty:
+                # Remove stopwords from the first text column
+                first_text_col = text_cols[0]
+                df['cleaned_text'] = df[first_text_col].astype(str).apply(remove_stopwords)
+                st.write(f"Stopwords removed from the first text column ('{first_text_col}'):")
+                st.dataframe(df[['cleaned_text']].head())
+                return "I've removed stopwords from the first text column of your dataset.  See the cleaned text above!"
+            else:
+                return "There are no text columns in your dataset to remove stopwords from."
+        else:
+            return "Stopwords are common words (e.g., 'the', 'a', 'is') that are often removed from text to improve NLP tasks.  Please upload a dataset with text columns to remove stopwords."
+
+    # --- Clarifying Vague Queries ---
+    if any(keyword in q_lower for keyword in ["data", "value", "row", "column", "shape"]):
+        if df is not None:
             return dataset_summary(df)
-        elif "describe" in q_lower or "statistics" in q_lower or "statistical summary" in q_lower:
-            return detailed_stats(df)
+        else:
+            return "You don’t have a dataset loaded yet, but I can explain terms like rows, columns, or values. For example, rows are records, and columns are features."
 
-    return "Hmm, I couldn't quite catch that. Could you ask something related to the data or the system's functionality?"
+    # --- Dataset-Specific Queries ---
+    if df is not None:
+        if "describe" in q_lower or "statistics" in q_lower or "summary" in q_lower:
+            return detailed_stats(df)
+        if "visualization" in q_lower or "plot" in q_lower:
+            data_visualizations(df)
+            return "Here’s a visualization of your dataset. Does this help clarify things?"
+        if "shape" in q_lower:
+            return f"Your dataset has {df.shape[0]} rows and {df.shape[1]} columns."
+
+    # --- General System Information ---
+    if "how it works" in q_lower or "about" in q_lower:
+        return system_knowledge["general"]["how_it_works"]
+
+    # --- Unrecognized Input with Friendly Tone ---
+    return "Hmm, I didn’t quite catch that. Could you clarify or ask something specific related to data science, machine learning, or data preprocessing? I’m here to help! 😄"
 
 # -----------------------------
 # Main Streamlit Page
 # -----------------------------
+
 def main():
     st.set_page_config(page_title="KlinItAll AI Data Assistant", page_icon="🤖")
     st.title("🤖 KlinItAll AI-Powered Data Assistant")
+    st.markdown("Hi there! I'm KlinItAll, your data mentor. Ask me anything about data science, machine learning, or data preprocessing! ✨")
 
+    # --- Dataset Loading (Optional) ---
     df = st.session_state.get("current_dataset", None)
-    if df is None:
-        st.warning("Please upload a dataset first! 🤖💡")
-        return
-    st.info(f"Dataset loaded: {df.shape[0]} rows, {df.shape[1]} columns")
+    # Removed file uploader
 
-    # Initialize chat history
+    # --- Chat History ---
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # Display chat messages from history on app rerun
+    # --- Display Chat Messages ---
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # React to user input
-    if prompt := st.chat_input("Ask me anything about your data or the system..."):
-        # Display user message in chat message container
+    # --- Chat Input and Response ---
+    if prompt := st.chat_input("Ask me anything..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
 
-        # Get the response
         response = answer_question(prompt, df)
-
-        # Display assistant response in chat message container
         st.session_state.messages.append({"role": "assistant", "content": response})
         with st.chat_message("assistant"):
             st.markdown(response)
