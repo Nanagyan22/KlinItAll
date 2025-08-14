@@ -518,7 +518,7 @@ def main():
         if st.button("History & Export", key="nav_history"):
             st.switch_page("pages/14_History_Export.py")
         if st.button("Settings & Help", key="nav_settings"):
-            st.switch_page("pages/16_Settings.py")
+            st.switch_page("pages/17_Settings.py")
 
     # Footer
     st.markdown("---")
