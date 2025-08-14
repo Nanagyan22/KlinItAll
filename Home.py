@@ -125,12 +125,17 @@ def main():
             <li>🛠️ One-click fixes</li>
             <li>📊 Automated profiling</li>
             <li>🎯 Intelligent recommendations</li>
-            <li>🤖  Data Story Narrator</li>
+            <li>🤖 Data Story Narrator</li>
+            <li>💬 Chat bot</li>
             <li>⏱️ Time-saving analytics</li>
+            <li>🔄 Batch Processing</li>
             </ul>
             </div>
             """, unsafe_allow_html=True)
 
+   
+
+    
     # System Overview
     st.markdown("---")
     st.markdown("## System Overview")
