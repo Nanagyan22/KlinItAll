@@ -128,13 +128,6 @@ with col2:
     fig.update_traces(textposition='inside', textinfo='percent+label')
     st.plotly_chart(fig, use_container_width=True)
     
-    # Quick stats
-    st.markdown("#### Quick Stats")
-    st.metric("Total Columns", len(df.columns))
-    st.metric("Numeric Columns", len(df.select_dtypes(include=[np.number]).columns))
-    st.metric("Text Columns", len(df.select_dtypes(include=['object']).columns))
-    st.metric("DateTime Columns", len(df.select_dtypes(include=['datetime64']).columns))
-
 # Manual Type Conversion
 st.markdown("---")
 st.markdown("### 🔧 Manual Type Conversion")
