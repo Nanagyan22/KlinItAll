@@ -233,7 +233,7 @@ def answer_question(question, df=None):
 
     # --- Friendly Greetings and Introductions ---
     if any(greet in q_lower for greet in ["hello", "hi", "hey", "you"]):
-        introduction = "Hey there! 👋 I'm KlinItAll, your AI-powered data assistant. I can help you with a wide range of data science tasks, including:\n\n"
+        introduction = "Hey there! 👋 I'm KlinIt-Bot, your AI-powered data assistant. I can help you with a wide range of data science tasks, including:\n\n"
         introduction += "- Answering questions about data science, machine learning, and AI\n"
         introduction += "- Providing explanations of data preprocessing techniques\n"
         introduction += "- Generating visualizations of data (if you upload a dataset)\n"
