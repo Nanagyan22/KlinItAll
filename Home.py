@@ -108,7 +108,7 @@ def main():
             while KlinItAll handles the repetitive tasks of data cleaning.
 
             ### Purpose of the App
-            KlinItAll automates the entire data preprocessing pipeline—from ingestion to cleaning, profiling, 
+            KlinItAll automates the entire data preprocessing pipeline from ingestion to cleaning, profiling, 
             feature engineering, and export. With minimal user input, you get clean, analysis-ready data in no time.
             """)
 
