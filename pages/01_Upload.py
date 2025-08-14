@@ -608,7 +608,8 @@ with upload_tabs[2]:
         
         elif cloud_provider == "Google Cloud Storage":
             st.markdown("#### 🔵 Google Cloud Storage Configuration")
-            gcp_service_account = st.text_area("Service Account JSON", type="password")
+            gcp_service_account = st.text_input("Service Account JSON", type="password")
+            #gcp_service_account = st.text_area("Service Account JSON", type="password")
             gcp_bucket = st.text_input("GCS Bucket Name")
             gcp_blob = st.text_input("Blob Name (filename.csv)")
             
