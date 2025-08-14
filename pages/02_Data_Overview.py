@@ -904,36 +904,15 @@ with overview_tabs[1]:
         st.dataframe(styled_activities, use_container_width=True)
 
 
-        # Define mapping for page names to actual file paths (no page numbers)
-page_map = {
-    "Home": "Home.py",
-    "Upload": "pages/01_Upload.py",
-    "Data Overview": "pages/02_Data_Overview.py",
-    "Clean Pipeline": "pages/04_Clean_Pipeline.py",
-    "Data Story Narrator": "pages/04_Data_Story_Narrator.py",
-    "ChatBot": "pages/05_ChatBot.py",
-    "Data Types": "pages/04_Data_Types.py",
-    "Duplicates Detection": "pages/05_Duplicates_Detection.py",
-    "Missing Values": "pages/06_Missing_Values.py",
-    "Outlier Detection": "pages/07_Outlier_Detection.py",
-    "Text Cleaning": "pages/08_Text_Cleaning.py",
-    "DateTime": "pages/09_DateTime.py",
-    "Geospatial": "pages/10_Geospatial.py",
-    "Categorical Encoding": "pages/11_Categorical_Encoding.py",
-    "Scaling Normalization": "pages/12_Scaling_Normalization.py",
-    "Feature Engineering": "pages/13_Feature_Engineering.py"
-        
-
-
         
         # Quick action buttons
-        st.markdown("#### ⚡ Quick Actions")
-        action_cols = st.columns(len(activities))
-        for i, activity in enumerate(activities):
-            with action_cols[i]:
-                if st.button(f"🚀 {activity['action']}", key=f"action_{i}"):
+        #st.markdown("#### ⚡ Quick Actions")
+        #action_cols = st.columns(len(activities))
+        #for i, activity in enumerate(activities):
+            #with action_cols[i]:
+                #if st.button(f"🚀 {activity['action']}", key=f"action_{i}"):
                     #st.switch_page(activity['page'])
-                    st.switch_page(page_map[activity['page']])
+                    #st.switch_page(page_map[activity['page']])
 
 with overview_tabs[5]:
     st.markdown("### 📊 Grouping & Segmentation")
