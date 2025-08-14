@@ -29,19 +29,6 @@ from utils.milestone_rewards import milestone_rewards
 st.set_page_config(page_title="Upload Data", page_icon="📥", layout="wide")
 
 
-# Show contextual hints based on tour state
-if st.session_state.tour_active:
-    if 'current_dataset' not in st.session_state or st.session_state.current_dataset is None:
-        guided_tour.show_character_hint("upload", custom_message="Great! You're on the Upload page. Let's get your data uploaded so we can start cleaning it together!", hint_type="info")
-    else:
-        guided_tour.show_character_hint("upload", custom_message="Perfect! I see you have data uploaded. Now you can either preview it below or jump straight to cleaning. I'm here to help guide you!", hint_type="success")
-
-st.title("📥 Upload Data")
-st.markdown("Upload your data files for preprocessing and analysis")
-
-# Show tour controls and hints
-guided_tour.show_tour_controls()
-
 # Initialize session state
 if 'upload_log' not in st.session_state:
     st.session_state.upload_log = []
@@ -56,6 +43,20 @@ if 'automation_stats' not in st.session_state:
         'manual_time_est': 0,
         'auto_time_est': 0
     }
+
+# Show contextual hints based on tour state
+if st.session_state.tour_active:
+    if 'current_dataset' not in st.session_state or st.session_state.current_dataset is None:
+        guided_tour.show_character_hint("upload", custom_message="Great! You're on the Upload page. Let's get your data uploaded so we can start cleaning it together!", hint_type="info")
+    else:
+        guided_tour.show_character_hint("upload", custom_message="Perfect! I see you have data uploaded. Now you can either preview it below or jump straight to cleaning. I'm here to help guide you!", hint_type="success")
+
+
+st.title("📥 Upload Data")
+st.markdown("Upload your data files for preprocessing and analysis")
+
+# Show tour controls and hints
+guided_tour.show_tour_controls()
 
 def log_dataset_upload(source, source_type, row_count, column_count, size_info=""):
     """Enhanced logging for dataset uploads"""
