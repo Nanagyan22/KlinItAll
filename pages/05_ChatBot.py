@@ -151,14 +151,14 @@ def data_visualizations(df):
         st.write("There are no numeric columns available for visualization.")
 
 # -----------------------------
-# Enhanced Answer Mapping with Clarification
+# Enhanced Answer Mapping with Clarification and Friendly Engagement
 # -----------------------------
-def ask_for_clarity(question, df):
+
+def ask_for_clarity(question):
     """Ask for clarification on the user's question."""
     if "missing" in question or "outlier" in question or "scaling" in question:
         return f"Did you mean to ask about **{', '.join([word for word in ['missing', 'outlier', 'scaling'] if word in question])}**? I can provide detailed information on this."
 
-    # Clarifying common terms
     elif "data preprocessing" in question:
         return "Are you referring to preprocessing steps like missing value handling, outlier detection, or scaling?"
 
@@ -168,16 +168,20 @@ def answer_question(question, df=None):
     """Answers the question based on the provided DataFrame and system knowledge."""
     q_lower = question.lower()
 
+    # Friendly Response for Greetings and Informal Queries
+    if "hello" in q_lower or "hi" in q_lower or "hey" in q_lower:
+        return "Hey there! 👋 How can I assist you with your data today?"
+
     # Handle yes/no clarification
     if "yes" in q_lower:
         return "Great! Let me provide you with the relevant information."
 
     elif "no" in q_lower:
-        return "Okay, I will need more details to help you with that. Could you clarify your question?"
+        return "Okay, could you clarify what you're asking about? I'm here to help!"
 
-    # Clarifying ambiguous questions
+    # Clarifying vague questions
     if any(keyword in q_lower for keyword in ['missing', 'outlier', 'scaling', 'data science', 'machine learning']):
-        return ask_for_clarity(question, df)
+        return ask_for_clarity(question)
 
     # Answering general Data Science questions (without needing data)
     if "data science" in q_lower:
@@ -190,7 +194,7 @@ def answer_question(question, df=None):
         return "Statistics is the science of collecting, analyzing, and interpreting data. Key concepts include mean, median, variance, correlation, and hypothesis testing."
 
     elif "outliers" in q_lower:
-        return "Outliers are extreme values that differ significantly from other observations in a dataset. They can be detected using statistical methods such as the IQR method or Z-scores."
+        return "Outliers are extreme values that differ significantly from other observations in a dataset. Would you like me to check for outliers in your dataset?"
 
     elif "missing values" in q_lower:
         return "Missing values occur when no data is recorded for a particular feature. Handling missing data can be done through methods like imputation (mean, median, mode) or deletion (drop rows/columns)."
@@ -208,7 +212,6 @@ def answer_question(question, df=None):
         elif "describe" in q_lower or "statistics" in q_lower or "statistical summary" in q_lower:
             return detailed_stats(df)
 
-    # Fallback response
     return "Hmm, I couldn't quite catch that. Could you ask something related to the data or the system's functionality?"
 
 # -----------------------------
@@ -243,10 +246,4 @@ def main():
         # Get the response
         response = answer_question(prompt, df)
 
-        # Display assistant response in chat message container
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        with st.chat_message("assistant"):
-            st.markdown(response)
-
-if __name__ == "__main__":
-    main()
+        # Display assistant r
