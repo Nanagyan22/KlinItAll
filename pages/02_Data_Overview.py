@@ -909,7 +909,8 @@ with overview_tabs[1]:
         for i, activity in enumerate(activities):
             with action_cols[i]:
                 if st.button(f"🚀 {activity['action']}", key=f"action_{i}"):
-                    st.switch_page(activity['page'])
+                    #st.switch_page(activity['page'])
+                    st.switch_page(page_map[activity['page']])
 
 with overview_tabs[5]:
     st.markdown("### 📊 Grouping & Segmentation")
