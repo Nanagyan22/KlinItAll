@@ -511,7 +511,7 @@ def main():
         if st.button("Feature Engineering", key="nav_feature"):
             st.switch_page("pages/13_Feature_Engineering.py")
         if st.button("Data Story Narrator", key="nav_story"):
-            st.switch_page("pages/10_Data_Story_Narrator.py")
+            st.switch_page("pages/04_Data_Story_Narrator.py")
 
     with nav_col4:
         st.markdown("**📊 Export & History**")
