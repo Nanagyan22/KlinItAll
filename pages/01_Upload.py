@@ -28,9 +28,6 @@ from utils.milestone_rewards import milestone_rewards
 
 st.set_page_config(page_title="Upload Data", page_icon="📥", layout="wide")
 
-st.title("📥 Upload Data")
-st.markdown("Upload your data files for preprocessing and analysis")
-
 
 # Show contextual hints based on tour state
 if st.session_state.tour_active:
@@ -38,6 +35,9 @@ if st.session_state.tour_active:
         guided_tour.show_character_hint("upload", custom_message="Great! You're on the Upload page. Let's get your data uploaded so we can start cleaning it together!", hint_type="info")
     else:
         guided_tour.show_character_hint("upload", custom_message="Perfect! I see you have data uploaded. Now you can either preview it below or jump straight to cleaning. I'm here to help guide you!", hint_type="success")
+
+st.title("📥 Upload Data")
+st.markdown("Upload your data files for preprocessing and analysis")
 
 # Show tour controls and hints
 guided_tour.show_tour_controls()
