@@ -1,211 +1,215 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from scipy.stats import skew, boxcox
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, QuantileTransformer
-from sklearn.impute import SimpleImputer, KNNImputer
+from scipy.stats import skew, kurtosis
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+import matplotlib.pyplot as plt
+import seaborn as sns
 import re  # For more robust text cleaning
 
 # -----------------------------
-# Helper Functions
+# System Knowledge Database (Data Science Topics)
+# -----------------------------
+
+system_knowledge = {
+    "general": {
+        "about_system": "KlinItAll is an advanced data preprocessing and analysis system. It automates tasks like missing value imputation, outlier detection, feature scaling, categorical encoding, and advanced data transformations to prepare data for analysis and modeling.",
+        "how_it_works": "KlinItAll automatically detects data issues such as missing values, outliers, skewed distributions, and inappropriate data types. The system then applies the best preprocessing techniques like imputation, scaling, and encoding, with full automation.",
+        "core_features": [
+            "Handling missing values",
+            "Outlier detection and treatment",
+            "Feature scaling and normalization",
+            "Categorical encoding (one-hot, label, etc.)",
+            "Feature engineering (binning, interaction features)",
+            "Advanced batch processing and scheduling",
+            "Data visualization and profiling",
+            "Fuzzy matching and duplicate detection"
+        ]
+    },
+    "data_preprocessing": {
+        "missing_values": {
+            "description": "Missing values occur when some data points are not available or recorded. The system detects columns with missing values and suggests imputation strategies.",
+            "methods": [
+                "Drop rows/columns with excessive missing values.",
+                "Impute with mean, median, or mode for small percentages of missing data.",
+                "Use KNN imputation or model-based imputation for larger missing values."
+            ]
+        },
+        "outliers": {
+            "description": "Outliers are extreme data points that deviate significantly from other observations in a dataset. The system uses methods like IQR, Z-score, or model-based techniques to detect and treat outliers.",
+            "methods": [
+                "Trim outliers (remove rows with extreme values).",
+                "Winsorize (capping the extreme values to a fixed range).",
+                "Replace outliers with the median or mean value."
+            ]
+        },
+        "scaling": {
+            "description": "Scaling involves adjusting the feature values so they are on the same scale, often necessary for algorithms sensitive to feature magnitudes, such as gradient descent or distance-based models.",
+            "methods": [
+                "StandardScaler (z-score normalization).",
+                "MinMaxScaler (scales data to a specific range, e.g., [0,1]).",
+                "RobustScaler (scales data based on median and IQR).",
+                "PowerTransformer (Yeo-Johnson, Box-Cox) to handle skewed data."
+            ]
+        },
+        "encoding": {
+            "description": "Encoding transforms categorical variables into a numerical format. The system suggests methods based on the cardinality of the categories.",
+            "methods": [
+                "One-hot encoding for columns with fewer than 15 unique categories.",
+                "Label encoding for ordinal categories.",
+                "Frequency encoding or target encoding for high cardinality categories."
+            ]
+        },
+        "feature_engineering": {
+            "description": "Feature engineering is the process of creating new features or transforming existing ones to improve the performance of machine learning models.",
+            "methods": [
+                "Binning (equal-width or equal-frequency binning).",
+                "Interaction features (e.g., product, ratio, difference between columns).",
+                "Dimensionality reduction using PCA, t-SNE, or UMAP."
+            ]
+        }
+    },
+    "statistics": {
+        "description": "Statistics is a critical aspect of data science. It involves collecting, analyzing, interpreting, presenting, and organizing data.",
+        "core_concepts": [
+            "Mean, Median, Mode",
+            "Variance, Standard Deviation",
+            "Skewness, Kurtosis",
+            "Correlation, Regression",
+            "Hypothesis Testing"
+        ],
+        "common_questions": {
+            "mean": "The **mean** is the average of all values in a dataset.",
+            "variance": "The **variance** measures the spread of data points around the mean.",
+            "skewness": "Skewness measures the asymmetry of the distribution of data. Positive skewness means the right tail is longer, while negative skewness means the left tail is longer.",
+            "correlation": "Correlation is a measure of the relationship between two variables. Values range from -1 (perfect negative) to +1 (perfect positive).",
+            "regression": "Regression is used to model relationships between variables, typically for prediction."
+        }
+    }
+}
+
+# -----------------------------
+# Helper Functions for Data Operations
 # -----------------------------
 
 def dataset_summary(df):
     """Provides a comprehensive summary of the dataset."""
-    summary = {
-        "rows": df.shape[0],
-        "columns": df.shape[1],
-        "column_names": df.columns.tolist(),
-        "data_types": df.dtypes.astype(str).to_dict(),
-        "memory_usage": f"{df.memory_usage(deep=True).sum() / 1024**2:.2f} MB",
-        "duplicate_rows": df.duplicated().sum()
-    }
-    numeric_cols = df.select_dtypes(include=np.number).columns
-    if not numeric_cols.empty:
-        summary["descriptive_stats"] = df[numeric_cols].describe().to_dict()
-    else:
-        summary["descriptive_stats"] = "No numerical columns found."
-    categorical_cols = df.select_dtypes(include="object").columns
-    value_counts = {}
-    for col in categorical_cols:
-        value_counts[col] = df[col].value_counts(dropna=False).head(5).to_dict()
-    summary["value_counts"] = value_counts
+    summary = f"Your dataset has **{df.shape[0]} rows** and **{df.shape[1]} columns**."
+    summary += "\nHere are the column names:\n" + ", ".join(df.columns)
     return summary
 
-def missing_info(df):
-    """Analyzes missing values and suggests imputation strategies."""
-    info = {}
-    for col in df.columns:
-        missing_count = df[col].isna().sum()
-        if missing_count > 0:
-            missing_percentage = (missing_count / len(df)) * 100
-            data_type = df[col].dtype
-            if np.issubdtype(data_type, np.number):
-                if missing_percentage < 5:
-                    suggestion = "Impute with mean/median. Consider KNN imputation if data is related."
-                elif missing_percentage < 20:
-                    suggestion = "Impute with median or KNN imputation. Model-based imputation is also an option."
-                else:
-                    suggestion = "Model-based imputation or multiple imputation. Consider missingness informativeness."
-            elif np.issubdtype(data_type, np.object_):
-                if missing_percentage < 5:
-                    suggestion = "Impute with mode. Consider creating a 'Missing' category."
-                elif missing_percentage < 20:
-                    suggestion = "Impute with mode or predict the missing category."
-                else:
-                    suggestion = "Consider missingness informativeness. Create a 'Missing' category or use model-based imputation."
-            else:
-                suggestion = "Impute appropriately based on the specific data type. Investigate the nature of missingness."
-            if missing_percentage > 50:
-                missingness_note = "High percentage of missing values. Consider dropping or advanced imputation."
-            else:
-                missingness_note = ""
-            info[col] = {
-                "missing": missing_count,
-                "percentage": f"{missing_percentage:.2f}%",
-                "suggestion": suggestion,
-                "missingness_note": missingness_note
-            }
-    return info
-
-def outlier_info(df):
-    """Identifies outliers using the IQR method and suggests handling strategies."""
-    info = {}
+def detailed_stats(df):
+    """Provides detailed descriptive statistics and insights on numerical columns."""
     numeric_cols = df.select_dtypes(include=np.number).columns
-    for col in numeric_cols:
-        q1 = df[col].quantile(0.25)
-        q3 = df[col].quantile(0.75)
-        iqr = q3 - q1
-        lower_bound = q1 - 1.5 * iqr
-        upper_bound = q3 + 1.5 * iqr
-        outliers = df[(df[col] < lower_bound) | (df[col] > upper_bound)]
-        num_outliers = outliers.shape[0]
-        outlier_percentage = (num_outliers / len(df)) * 100
-        if num_outliers > 0:
-            if outlier_percentage < 1:
-                action = "Consider trimming or winsorizing. Evaluate the impact on the distribution."
-            elif outlier_percentage < 5:
-                action = "Winsorizing or capping is recommended. Transform if skewed."
-            else:
-                action = "Investigate carefully. Consider genuine data points or errors. Robust methods may be necessary."
-            info[col] = {
-                "num_outliers": num_outliers,
-                "percentage": f"{outlier_percentage:.2f}%",
-                "lower_bound": lower_bound,
-                "upper_bound": upper_bound,
-                "action": action
-            }
-    return info
+    if numeric_cols.empty:
+        return "It seems like there are no numerical columns in your dataset, so I can't calculate statistics like mean or standard deviation."
 
-def scaling_advice(df):
-    """Provides advice on scaling and normalization techniques."""
-    advice = {}
+    stats = []
+    for col in numeric_cols:
+        col_data = df[col].dropna()
+        mean = col_data.mean()
+        median = col_data.median()
+        std_dev = col_data.std()
+        skewness = skew(col_data)
+        kurt = kurtosis(col_data)
+        
+        stats.append(f"### {col} Statistics:\n")
+        stats.append(f"  - **Mean**: {mean:.2f} (The average value)")
+        stats.append(f"  - **Median**: {median:.2f} (The middle value when sorted)")
+        stats.append(f"  - **Standard Deviation**: {std_dev:.2f} (How spread out the values are)")
+        stats.append(f"  - **Skewness**: {skewness:.2f} (How asymmetric the data is)")
+        stats.append(f"  - **Kurtosis**: {kurt:.2f} (How peaked the data distribution is)")
+
+        # Interpretation of skewness and kurtosis
+        if skewness > 0:
+            stats.append(f"  - **Skewness Interpretation**: The data is positively skewed (tail on the right).")
+        elif skewness < 0:
+            stats.append(f"  - **Skewness Interpretation**: The data is negatively skewed (tail on the left).")
+        else:
+            stats.append(f"  - **Skewness Interpretation**: The data is symmetrical.")
+
+        if kurt > 3:
+            stats.append(f"  - **Kurtosis Interpretation**: The data has heavy tails (leptokurtic).")
+        elif kurt < 3:
+            stats.append(f"  - **Kurtosis Interpretation**: The data is light-tailed (platykurtic).")
+        else:
+            stats.append(f"  - **Kurtosis Interpretation**: The data has a normal peak (mesokurtic).")
+    
+    return "\n".join(stats)
+
+def data_visualizations(df):
+    """Generates and returns visualizations for the dataset."""
     numeric_cols = df.select_dtypes(include=np.number).columns
-    for col in numeric_cols:
-        data = df[col].dropna()
-        skewness = skew(data)
-        abs_skew = abs(skewness)
-        if abs_skew > 1:
-            if all(data > 0):
-                transform = "Log transformation (if all values are positive) or Box-Cox transformation."
-            else:
-                transform = "Box-Cox or Yeo-Johnson transformation."
-            scaler = "After transformation, consider StandardScaler or MinMaxScaler."
-            advice[col] = f"Skew={skewness:.2f}: {transform} {scaler}"
-        elif abs_skew > 0.5:
-            transform = "Consider a square root or Box-Cox/Yeo-Johnson transformation."
-            scaler = "StandardScaler or MinMaxScaler can be used after transformation."
-            advice[col] = f"Skew={skewness:.2f}: {transform} {scaler}"
-        else:
-            scaler = "StandardScaler is generally suitable. MinMaxScaler can be used if a specific range is required."
-            advice[col] = f"Skew={skewness:.2f}: {scaler}"
-    return advice
-
-def encoding_advice(df):
-    """Provides advice on encoding categorical features."""
-    advice = {}
-    cat_cols = df.select_dtypes(include="object").columns
-    for col in cat_cols:
-        n_unique = df[col].nunique()
-        if n_unique < 5:
-            advice[col] = f"One-hot encoding is recommended. Consider ordinal encoding if categories have a natural order."
-        elif n_unique < 15:
-            advice[col] = f"One-hot encoding is feasible. Consider target encoding or frequency encoding."
-        else:
-            advice[col] = f"Target encoding, frequency encoding, or WOE encoding are recommended. Be mindful of overfitting."
-    return advice
-
-def text_cleaning_advice(df):
-    """Provides advice on cleaning text columns."""
-    advice = {}
-    text_cols = df.select_dtypes(include="object").columns
-    for col in text_cols:
-        has_special = df[col].str.contains(r"[^a-zA-Z0-9\s]", regex=True).any()
-        has_encoding_issues = df[col].str.contains(r"[\u0080-\uffff]").any()
-        if has_special:
-            advice[col] = "Contains special characters. Remove or replace them. Consider stemming/lemmatization."
-        elif has_encoding_issues:
-            advice[col] = "Potential encoding issues detected. Ensure consistent UTF-8 encoding."
-        else:
-            advice[col] = "Text appears clean. Consider lowercasing and removing punctuation."
-        advice[col] += " General steps: Lowercasing, punctuation removal, stop word removal, stemming/lemmatization."
-    return advice
-
-def feature_engineering_advice(df):
-    """Suggests potential feature engineering opportunities."""
-    advice = {}
-    numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
-    datetime_cols = df.select_dtypes(include=['datetime64']).columns.tolist()
-    for i, col1 in enumerate(numeric_cols):
-        for col2 in numeric_cols[i+1:]:
-            advice[f"{col1}*{col2}"] = f"Consider interaction feature between {col1} and {col2}."
-            advice[f"{col1}/{col2}"] = f"Consider ratio feature between {col1} and {col2} (if appropriate). Handle division by zero."
-    for col in datetime_cols:
-        advice[f"Extract features from {col}"] = f"Extract year, month, day, day of week, and hour from {col}."
-    if len(numeric_cols) > 0:
-        advice["Polynomial Features"] = "Consider creating polynomial features for numerical columns."
-    return advice
-
-# -----------------------------
-# Answer Mapping
-# -----------------------------
-def answer_question(question, df):
-    """Answers the question based on the provided DataFrame."""
-    q_lower = question.lower()
-    if "dataset summary" in q_lower:
-        return dataset_summary(df)
-    elif "missing" in q_lower:
-        return missing_info(df)
-    elif "outlier" in q_lower:
-        return outlier_info(df)
-    elif "scale" in q_lower or "normalize" in q_lower:
-        return scaling_advice(df)
-    elif "categorical" in q_lower or "encoding" in q_lower:
-        return encoding_advice(df)
-    elif "text" in q_lower or "clean" in q_lower:
-        return text_cleaning_advice(df)
-    elif "feature engineering" in q_lower:
-        return feature_engineering_advice(df)
-    elif "total sales" in q_lower:
-        sales_column = next((col for col in df.columns if "sales" in col.lower() and np.issubdtype(df[col].dtype, np.number)), None)
-        if sales_column:
-            return f"Total sales: {df[sales_column].sum():.2f}"
-        else:
-            return "No sales column found."
-    elif "unique regions" in q_lower:
-        region_column = next((col for col in df.columns if "region" in col.lower()), None)
-        if region_column:
-            return f"Number of unique regions: {df[region_column].nunique()}"
-        else:
-            return "No 'Region' column found."
-    elif "unique cities" in q_lower:
-        city_column = next((col for col in df.columns if "city" in col.lower()), None)
-        if city_column:
-            return f"Number of unique cities: {df[city_column].nunique()}"
-        else:
-            return "No 'City' column found."
+    if not numeric_cols.empty:
+        fig, ax = plt.subplots(1, 2, figsize=(12, 6))
+        sns.histplot(df[numeric_cols[0]].dropna(), kde=True, ax=ax[0])
+        ax[0].set_title(f'Distribution of {numeric_cols[0]}')
+        sns.boxplot(data=df[numeric_cols[0]].dropna(), ax=ax[1])
+        ax[1].set_title(f'Boxplot of {numeric_cols[0]}')
+        st.pyplot(fig)
     else:
-        return "Sorry, I cannot answer that question directly."
+        st.write("There are no numeric columns available for visualization.")
+
+# -----------------------------
+# Enhanced Answer Mapping with Clarification
+# -----------------------------
+def ask_for_clarity(question, df):
+    """Ask for clarification on the user's question."""
+    if "missing" in question or "outlier" in question or "scaling" in question:
+        return f"Did you mean to ask about **{', '.join([word for word in ['missing', 'outlier', 'scaling'] if word in question])}**? I can provide detailed information on this."
+
+    # Clarifying common terms
+    elif "data preprocessing" in question:
+        return "Are you referring to preprocessing steps like missing value handling, outlier detection, or scaling?"
+
+    return "I'm not sure I understand. Could you clarify your question? Are you asking about a specific aspect of the data or a method?"
+
+def answer_question(question, df=None):
+    """Answers the question based on the provided DataFrame and system knowledge."""
+    q_lower = question.lower()
+
+    # Handle yes/no clarification
+    if "yes" in q_lower:
+        return "Great! Let me provide you with the relevant information."
+
+    elif "no" in q_lower:
+        return "Okay, I will need more details to help you with that. Could you clarify your question?"
+
+    # Clarifying ambiguous questions
+    if any(keyword in q_lower for keyword in ['missing', 'outlier', 'scaling', 'data science', 'machine learning']):
+        return ask_for_clarity(question, df)
+
+    # Answering general Data Science questions (without needing data)
+    if "data science" in q_lower:
+        return "Data science involves extracting insights and knowledge from structured and unstructured data. It combines techniques from statistics, machine learning, and data mining to analyze and interpret complex data."
+
+    elif "machine learning" in q_lower:
+        return "Machine learning is a field of AI that focuses on building algorithms that allow computers to learn from data and make predictions or decisions based on that data."
+
+    elif "statistics" in q_lower:
+        return "Statistics is the science of collecting, analyzing, and interpreting data. Key concepts include mean, median, variance, correlation, and hypothesis testing."
+
+    elif "outliers" in q_lower:
+        return "Outliers are extreme values that differ significantly from other observations in a dataset. They can be detected using statistical methods such as the IQR method or Z-scores."
+
+    elif "missing values" in q_lower:
+        return "Missing values occur when no data is recorded for a particular feature. Handling missing data can be done through methods like imputation (mean, median, mode) or deletion (drop rows/columns)."
+
+    elif "scaling" in q_lower:
+        return "Scaling refers to the process of adjusting feature values to a standard range, often necessary for algorithms that are sensitive to feature magnitudes, such as gradient descent or distance-based models."
+
+    elif "data preprocessing" in q_lower:
+        return "Data preprocessing involves cleaning and transforming raw data into a format suitable for analysis. Common steps include handling missing values, encoding categorical data, scaling features, and detecting outliers."
+
+    # Handle specific dataset questions (only if data is available)
+    if df is not None:
+        if "dataset summary" in q_lower:
+            return dataset_summary(df)
+        elif "describe" in q_lower or "statistics" in q_lower or "statistical summary" in q_lower:
+            return detailed_stats(df)
+
+    # Fallback response
+    return "Hmm, I couldn't quite catch that. Could you ask something related to the data or the system's functionality?"
 
 # -----------------------------
 # Main Streamlit Page
@@ -216,7 +220,7 @@ def main():
 
     df = st.session_state.get("current_dataset", None)
     if df is None:
-        st.warning("Please upload a dataset first!")
+        st.warning("Please upload a dataset first! 🤖💡")
         return
     st.info(f"Dataset loaded: {df.shape[0]} rows, {df.shape[1]} columns")
 
@@ -230,7 +234,7 @@ def main():
             st.markdown(message["content"])
 
     # React to user input
-    if prompt := st.chat_input("Ask me anything about your data..."):
+    if prompt := st.chat_input("Ask me anything about your data or the system..."):
         # Display user message in chat message container
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
