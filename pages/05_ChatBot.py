@@ -246,4 +246,10 @@ def main():
         # Get the response
         response = answer_question(prompt, df)
 
-        # Display assistant r
+        # Display assistant response in chat message container
+        st.session_state.messages.append({"role": "assistant", "content": response})
+        with st.chat_message("assistant"):
+            st.markdown(response)
+
+if __name__ == "__main__":
+    main()
