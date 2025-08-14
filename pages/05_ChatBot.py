@@ -27,7 +27,7 @@ except LookupError:
 
 system_knowledge = {
     "general": {
-        "about_system": "KlinItAll is an advanced AI-powered data assistant designed to help you with all aspects of data science, from understanding basic concepts to performing complex data preprocessing and analysis tasks. I can answer questions, provide explanations, generate visualizations, and even suggest code snippets to help you work with your data more effectively.",
+        "about_system": "KlinIt-Bot is an advanced AI-powered data assistant designed to help you with all aspects of data science, from understanding basic concepts to performing complex data preprocessing and analysis tasks. I can answer questions, provide explanations, generate visualizations, and even suggest code snippets to help you work with your data more effectively.",
         "how_it_works": "I use a combination of natural language processing (NLP) and a comprehensive knowledge base to understand your questions and provide relevant answers. If you upload a dataset, I can also analyze it and provide insights specific to your data.",
         "core_features": [
             "Answering questions about data science, machine learning, and AI",
@@ -347,9 +347,9 @@ def answer_question(question, df=None):
 # -----------------------------
 
 def main():
-    st.set_page_config(page_title="KlinItAll AI Data Assistant", page_icon="🤖")
-    st.title("🤖 KlinItAll AI-Powered Data Assistant")
-    st.markdown("Hi there! I'm KlinItAll, your data mentor. Ask me anything about data science, machine learning, or data preprocessing! ✨")
+    st.set_page_config(page_title="KlinIt-Bot AI Data Assistant", page_icon="🤖")
+    st.title("🤖 KlinIt-Bot AI-Powered Data Assistant")
+    st.markdown("Hi there! I'm KlinIt-Bot, your data mentor. Ask me anything about data science, machine learning, or data preprocessing! ✨")
 
     # --- Dataset Loading (Optional) ---
     df = st.session_state.get("current_dataset", None)
