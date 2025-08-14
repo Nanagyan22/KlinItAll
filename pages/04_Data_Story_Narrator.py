@@ -718,16 +718,16 @@ with col2:
             st.markdown(f"⏳ {name}")
     
     # Quick stats
-    st.markdown("### 📊 Quick Stats")
-    stats_data = {
-        'Dataset Size': f"{len(df):,} × {len(df.columns)}",
-        'Memory Usage': f"{df.memory_usage(deep=True).sum() / 1024**2:.1f} MB",
-        'Completeness': f"{((df.size - df.isnull().sum().sum()) / df.size) * 100:.1f}%",
-        'Story Progress': f"{st.session_state.story_state['current_chapter']}/4"
-    }
+    #st.markdown("### 📊 Quick Stats")
+    #stats_data = {
+     #   'Dataset Size': f"{len(df):,} × {len(df.columns)}",
+      #  'Memory Usage': f"{df.memory_usage(deep=True).sum() / 1024**2:.1f} MB",
+       # 'Completeness': f"{((df.size - df.isnull().sum().sum()) / df.size) * 100:.1f}%",
+        #'Story Progress': f"{st.session_state.story_state['current_chapter']}/4"
+    #}
     
-    for key, value in stats_data.items():
-        st.metric(key, value)
+    #for key, value in stats_data.items():
+     #   st.metric(key, value)
 
 # Footer
 st.markdown("---")
