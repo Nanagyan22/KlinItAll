@@ -138,7 +138,7 @@ with overview_tabs[0]:
     
     # Statistical interpretation
     if numeric_cols:
-        st.markdown("###T 📝 Statistical Interpretation")
+        st.markdown("###📝 Statistical Interpretation")
         interpretation_col1, interpretation_col2 = st.columns(2)
         
         with interpretation_col1:
