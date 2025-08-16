@@ -41,9 +41,6 @@ KlinItAll addresses the common challenge in data science: **50–80% of project 
 - Tracks preprocessing activities in real-time.  
 - Displays statistics, progress, and AI summaries.  
 
-![Data Overview](img/Summary.png)  
-
----
 ![Data Overview](img/Aiexplain.png)  
 
 ---
