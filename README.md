@@ -158,6 +158,10 @@ Francis Afful Gyan, M.Sc., University of Ghana Business School
 
 ---
 
+**Live Deployment:** [Access KlinItAll](https://klinitall.streamlit.app/)
+
+---
+
 ## Contact
 For questions, collaboration, or research inquiries:  
 [![LinkedIn](https://img.shields.io/static/v1?message=LinkedIn&logo=linkedin&label=&color=0077B5&logoColor=white&labelColor=&style=for-the-badge)](https://www.linkedin.com/in/francis-afful-gyan-2b27a5153/)
