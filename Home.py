@@ -456,7 +456,7 @@ def main():
                     <img src="{image_base64}" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;">
                     <p style="text-align: center;">
                         “Every data project begins with excitement, until you meet the messy, chaotic reality of raw data.
-                            On my path to becoming a data scientist, I discovered that nearly 60%-80% of my time disappeared into cleaning, formatting, and fixing datasets.
+                            On my path to becoming a data scientist, I discovered that nearly 60-80% of my time disappeared into cleaning, formatting, and fixing datasets.
                             It was slow. It was repetitive. And it stole precious hours from the real work finding insights and building models.
                             That’s why I created KlinItAll: a smart, user-friendly data preprocessing companion that takes care of the tedious tasks for you. 
                             With KlinItAll, you spend less time scrubbing data and more time delivering impact...”
