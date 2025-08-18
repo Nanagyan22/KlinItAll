@@ -1021,7 +1021,7 @@ merge_tabs = st.tabs([
     "📊 Grouping Operations"
 ])
 
-# ==================== TAB 1: AUTOMATED MERGING ====================
+# ====================TAB 1: AUTOMATED MERGING ====================
 with merge_tabs[0]:
     st.markdown(" 🔄 Merge/Join Datasets Automatically (AI-Selected Keys)")
     st.markdown("""
@@ -1180,7 +1180,7 @@ with merge_tabs[0]:
             else:
                 st.info("No datasets uploaded for merging")
     
-# ==================== TAB 2: ADVANCED JOINING ====================
+# ====================TAB 2: ADVANCED JOINING ====================
 with merge_tabs[1]:
     st.markdown(" 🎯 Advanced Joining Operations")
     
@@ -1377,7 +1377,7 @@ with merge_tabs[2]:
     else:
         st.info("ℹ️ Upload a dataset to enable grouping operations")
 
-# ==================== DATASET INFORMATION SECTION (MOVED OUT OF TAB) ====================
+# ==================== DATASET INFORMATION SECTION====================
 st.markdown("---")
 st.markdown("### 📋 Dataset Information")
 
@@ -1458,7 +1458,7 @@ if st.session_state.upload_log:
 else:
     st.info("ℹ️ Upload datasets to see aggregated information and processing statistics")
 
-# ==================== DATASET UPLOAD LOGGING ====================
+# ==================== DATASET UPLOAD LOGGING====================
 st.markdown("---")
 st.markdown("### 📝 Dataset Upload Logging")
 
@@ -1519,7 +1519,7 @@ if st.session_state.upload_log:
 else:
     st.info("📝 No uploads logged yet. Upload a dataset to start tracking.")
 
-# ==================== SIDEBAR: UPLOAD MANAGEMENT ====================
+# ====================SIDEBAR: UPLOAD MANAGEMENT====================
 with st.sidebar:
     st.markdown("### 📂 Upload Management")
     
