@@ -347,9 +347,7 @@ def show_celebration_balloons(message, count=0, celebration_type="success"):
             # Standard Streamlit balloons for extra effect
             st.balloons()
             
-            # Remove the sleep to avoid blocking the app
-            # celebration_placeholder will be cleared on next rerun
-
+            
 def initialize_comprehensive_stats():
     """Initialize comprehensive statistics tracking"""
     if 'comprehensive_stats' not in st.session_state:
@@ -1127,7 +1125,7 @@ with col4:
 # Show the current tab content based on index
 st.markdown("---")
 
-# ==================== TAB 1: DETECT & CONVERT DATA TYPES ====================
+# ====================TAB 1: DETECT & CONVERT DATA TYPES==================
 if current_tab == 0:
     st.subheader("🔍 Detect & Convert Data Types")
     
@@ -1296,7 +1294,7 @@ if current_tab == 0:
             mime="text/csv"
         )
 
-# ==================== TAB 2: REMOVE DUPLICATES ====================
+# ====================TAB 2: REMOVE DUPLICATES====================
 elif current_tab == 1:
     st.subheader("🔄 Remove Duplicates")
     
@@ -1388,7 +1386,7 @@ elif current_tab == 1:
         st.markdown("#### 📊 Post-Treatment Dataset")
         st.dataframe(df.head(), use_container_width=True)
 
-# ==================== TAB 3: HANDLE MISSING VALUES ====================
+# ====================TAB 3: HANDLE MISSING VALUES===================
 elif current_tab == 2:
     st.subheader("🕳️ Handle Missing Values")
     
@@ -2142,7 +2140,7 @@ elif current_tab == 6:
         st.markdown("#### 📊 Post-Treatment Dataset")
         st.dataframe(df.head(), use_container_width=True)
 
-# ==================== TAB 8: ENCODE CATEGORICAL VARIABLES ====================
+# ====================TAB 8: ENCODE CATEGORICAL VARIABLES ====================
 elif current_tab == 7:
     st.subheader("🏷️ Encode Categorical Variables")
     
